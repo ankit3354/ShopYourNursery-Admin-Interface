@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import { usePlantsAdminContext } from "@/contexts/PlantsAdminProvider";
 import { useParams } from "react-router-dom";
 
@@ -6,10 +6,9 @@ function PlantsAdmin() {
   const { handleAddPlantsAdmin, handleUpdatePlantsAdmin, getPlantById } =
     usePlantsAdminContext(); // Access the context
   const { id } = useParams();
-  const fileInputRef = useRef(null);
 
   const { addPlant } = handleAddPlantsAdmin;
-  const initailFormData = {
+  const initialFormData = {
     title: "",
     description: "",
     price: 0,
@@ -20,31 +19,31 @@ function PlantsAdmin() {
     rating: 0,
     featured: false,
     popular: false,
-    size: [],
+    size: "", // Change from [] to ""
     sunlightRequirement: "",
     waterFrequency: "",
-    waterFrequencyDescription: [],
+    waterFrequencyDescription: "", // Change from [] to ""
     replacementAvailable: false,
     expertGuidance: false,
     preOrderStatus: false,
     place: "",
     growthRate: "",
-    benefits: [],
+    benefits: "", // Change from [] to ""
     imgs: [],
-    nutritionalNeeds: [],
+    nutritionalNeeds: "", // Change from [] to ""
     seasonalAvailability: "",
-    propagationMethod: [],
+    propagationMethod: "", // Change from [] to ""
     pestResistance: "",
     toxicityLevel: "",
     tag: "",
-    plantTags: [],
+    plantTags: "", // Change from [] to ""
     promotionTags: "",
-    plantAccessories: [],
+    plantAccessories: "", // Change from [] to ""
     category: "",
-    plantCare: [],
+    plantCare: "", // Change from [] to ""
   };
   const [formData, setFormData] =
-    useState<Record<string, any>>(initailFormData);
+    useState<Record<string, any>>(initialFormData);
 
   useEffect(() => {
     if (id) {
@@ -79,7 +78,7 @@ function PlantsAdmin() {
   // Add New Plants
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("FormData in Submit form : ", formData);
+    console.log("Submitted : ", formData);
     try {
       if (id) {
         await handleUpdatePlantsAdmin.mutate({
@@ -91,7 +90,7 @@ function PlantsAdmin() {
         const newPlant = await addPlant(formData);
         console.log("Plant added successfully:", newPlant);
       }
-      setFormData(initailFormData);
+      setFormData(initialFormData);
     } catch (error) {
       console.error("Failed to add plant:", error);
     }
@@ -114,7 +113,7 @@ function PlantsAdmin() {
               <input
                 type="text"
                 name="title"
-                value={formData.title}
+                value={formData.title || ""}
                 onChange={handleChange}
                 required
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
@@ -128,7 +127,7 @@ function PlantsAdmin() {
               <input
                 type="number"
                 name="price"
-                value={formData.price}
+                value={formData.price || ""}
                 onChange={handleChange}
                 required
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
@@ -141,7 +140,7 @@ function PlantsAdmin() {
               </label>
               <textarea
                 name="description"
-                value={formData.description}
+                value={formData.description || ""}
                 onChange={handleChange}
                 required
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
@@ -155,7 +154,7 @@ function PlantsAdmin() {
               <input
                 type="number"
                 name="discountPercentage"
-                value={formData.discountPercentage}
+                value={formData.discountPercentage || ""}
                 onChange={handleChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               />
@@ -168,7 +167,7 @@ function PlantsAdmin() {
               <input
                 type="number"
                 name="markedPrice"
-                value={formData.markedPrice}
+                value={formData.markedPrice || ""}
                 onChange={handleChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               />
@@ -181,7 +180,7 @@ function PlantsAdmin() {
               <input
                 type="number"
                 name="quantity"
-                value={formData.quantity}
+                value={formData.quantity || ""}
                 onChange={handleChange}
                 required
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
@@ -194,7 +193,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="featured"
-                value={formData?.featured ? "true" : "false"}
+                value={formData.featured ? "true" : "false"}
                 onChange={handleChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -224,7 +223,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="size"
-                value={formData.size}
+                value={formData?.size || ""}
                 onChange={handleChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -240,7 +239,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="sunlightRequirement"
-                value={formData.sunlightRequirement}
+                value={formData?.sunlightRequirement || ""}
                 onChange={handleChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -258,7 +257,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="waterFrequency"
-                value={formData.waterFrequency}
+                value={formData?.waterFrequency || ""}
                 onChange={handleChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -276,7 +275,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="waterFrequencyDescription"
-                value={formData.waterFrequencyDescription}
+                value={formData?.waterFrequencyDescription || ""}
                 onChange={handleChange}
                 className="mt-2 p-3 border border-gray-300 rounded w-full"
               >
@@ -335,7 +334,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="growthRate"
-                value={formData.growthRate}
+                value={formData?.growthRate || ""}
                 onChange={handleChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -351,7 +350,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="replacementAvailable"
-                value={formData.replacementAvailable ? "true" : "false"}
+                value={formData?.replacementAvailable ? "true" : "false"}
                 onChange={handleChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -381,7 +380,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="place"
-                value={formData?.place}
+                value={formData?.place || ""}
                 onChange={handleArrayChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -397,7 +396,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="benefits"
-                value={formData?.benefits}
+                value={formData?.benefits || ""}
                 onChange={handleArrayChange}
                 className="mt-2 p-3 border border-gray-300 rounded w-full bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -504,7 +503,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="nutritionalNeeds"
-                value={formData?.nutritionalNeeds}
+                value={formData?.nutritionalNeeds || ""}
                 onChange={handleArrayChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -544,7 +543,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="seasonalAvailability"
-                value={formData.seasonalAvailability}
+                value={formData?.seasonalAvailability || ""}
                 onChange={handleChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -562,7 +561,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="propagationMethod"
-                value={formData.propagationMethod}
+                value={formData.propagationMethod || ""}
                 onChange={handleArrayChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -580,7 +579,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="pestResistance"
-                value={formData?.pestResistance}
+                value={formData?.pestResistance || ""}
                 onChange={handleArrayChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -596,7 +595,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="toxicityLevel"
-                value={formData?.toxicityLevel}
+                value={formData?.toxicityLevel || ""}
                 onChange={handleArrayChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -611,7 +610,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="tag"
-                value={formData?.tag}
+                value={formData?.tag || ""}
                 onChange={handleArrayChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -627,7 +626,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="plantTags"
-                value={formData?.plantTags}
+                value={formData?.plantTags || ""}
                 onChange={handleArrayChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -655,7 +654,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="promotionTags"
-                value={formData?.promotionTags}
+                value={formData?.promotionTags || ""}
                 onChange={handleArrayChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -670,7 +669,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="plantAccessories"
-                value={formData?.plantAccessories}
+                value={formData?.plantAccessories || ""}
                 onChange={handleArrayChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -696,7 +695,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="category"
-                value={formData?.category}
+                value={formData?.category || ""}
                 onChange={handleArrayChange}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
               >
@@ -712,7 +711,7 @@ function PlantsAdmin() {
               </label>
               <select
                 name="plantCare"
-                value={formData?.plantCare}
+                value={formData?.plantCare || ""}
                 onChange={handleArrayChange}
                 className="mt-2 p-3 border border-gray-300 rounded w-full max-w-md overflow-hidden"
               >

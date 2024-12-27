@@ -29,14 +29,11 @@ const createAdminPlant = async (req, res) => {
     if (!title) {
       return res.status(400).json({ message: "Plant title is required" });
     }
-
     const imageUrls = [];
-
     if (req.files && req.files.imgs) {
       const images = Array.isArray(req.files.imgs)
         ? req.files.imgs
         : [req.files.imgs];
-
       // Upload each image to a Cloudinary folder named after the plant title
       for (const image of images) {
         const result = await cloudinary.uploader.upload(image.tempFilePath, {

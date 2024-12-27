@@ -8,9 +8,8 @@ import {
 
 export const useAddPlantsAdmin = () => {
   const dispatch = useDispatch();
-
   const addPlant = async (plantData: any) => {
-    dispatch(setLoading(true)); // Set loading to true before starting the request
+    dispatch(setLoading(true));
     try {
       const newPlant = await createPlantsAdmin(plantData); // API call to create the plant
       dispatch(addPlantsAdmin(newPlant)); // Add the new plant to Redux state

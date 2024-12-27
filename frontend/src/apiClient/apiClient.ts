@@ -7,7 +7,7 @@ export const getPlantsAdmin = async () => {
 };
 
 export const createPlantsAdmin = async (plantData: any) => {
-  const response = await fetch(`${API_BASE_URL}/api/postplants_admin`, {
+  const response = await fetch(`${API_BASE_URL}/api/postInplants_admin`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -38,10 +38,7 @@ export const updatePlantsAdmin = async (id: string, updateData: any) => {
   return response.json(); // Return the updated plant data
 };
 
-
-
-
-// Get Search Query PlantsAdmin 
+// Get Search Query PlantsAdmin
 export const getSearchQueryPlants = async (query: string) => {
   const response = await fetch(
     `${API_BASE_URL}/api/plants/search/query?q=${query}`,
@@ -56,7 +53,6 @@ export const getSearchQueryPlants = async (query: string) => {
   }
   return json;
 };
-
 
 export const fetchPlants = async (filters: any) => {
   const response = await fetch(`${API_BASE_URL}/api/plants/search`, {
