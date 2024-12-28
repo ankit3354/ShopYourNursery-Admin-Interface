@@ -10,12 +10,7 @@ const app = express();
 const PORT = process.env.PORT || 3003;
 
 // Allowed origins (add other domains if needed)
-const allowedOrigins = [
-  process.env.FE1,
-  process.env.FE2,
-  process.env.FE3,
-  process.env.FE4,
-];
+const allowedOrigins = [process.env.FE1, process.env.FE2, process.env.FE3];
 // Connect to MongoDB
 connectDB();
 
