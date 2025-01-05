@@ -6,16 +6,54 @@ export const getPlantsAdmin = async () => {
   return response.json(); // Returns the plant data
 };
 
-export const createPlantsAdmin = async (plantData: any) => {
+export const createPlantsAdmin = async (formData: FormData) => {
+  // const formData = new FormData();
+  // // Loop through the plantData to append fields
+  // for (const key in plantData) {
+  //   if (key === "imgs") {
+  //     // Append multiple images
+  //     plantData[key].forEach((file: any) => formData.append("imgs", file));
+  //   } else if (Array.isArray(plantData[key])) {
+  //     // Append each array item as a separate field
+  //     plantData[key].forEach((item: any) => formData.append(key, item));
+  //   } else {
+  //     // Append regular fields
+  //     formData.append(key, plantData[key]);
+  //   }
+  // }
   const response = await fetch(`${API_BASE_URL}/api/postInplants_admin`, {
     method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(plantData),
+    body: formData,
   });
+
   if (!response.ok) throw new Error("Failed to create plant");
-  return response.json();
+  return response
+    .json()
+    .then((data) => console.log("Success:", data))
+    .catch((error) => console.error("Error:", error));
+};
+
+export const updatePlantsAdmin = async (id: string, formData: FormData) => {
+  // const formData = new FormData();
+  // // Loop through the updateData object to append fields
+  // for (const key in updateData) {
+  //   if (key === "imgs") {
+  //     // Append multiple images
+  //     updateData[key].forEach((file: any) => formData.append("imgs", file));
+  //   } else if (Array.isArray(updateData[key])) {
+  //     // Append each array item as a separate field
+  //     updateData[key].forEach((item: any) => formData.append(key, item));
+  //   } else {
+  //     // Append regular fields
+  //     formData.append(key, updateData[key]);
+  //   }
+  // }
+  const response = await fetch(`${API_BASE_URL}/api/plants_admin/${id}`, {
+    method: "PUT",
+    body: formData,
+  });
+  if (!response.ok) throw new Error("Failed to update plant");
+  return response.json(); // Return the updated plant data
 };
 
 export const deletePlantsAdmin = async (id: any) => {
@@ -24,18 +62,6 @@ export const deletePlantsAdmin = async (id: any) => {
   });
   if (!response.ok) throw new Error("Failed to delete plant");
   return response.json();
-};
-
-export const updatePlantsAdmin = async (id: string, updateData: any) => {
-  const response = await fetch(`${API_BASE_URL}/api/plants_admin/${id}`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(updateData),
-  });
-  if (!response.ok) throw new Error("Failed to update plant");
-  return response.json(); // Return the updated plant data
 };
 
 // Get Search Query PlantsAdmin

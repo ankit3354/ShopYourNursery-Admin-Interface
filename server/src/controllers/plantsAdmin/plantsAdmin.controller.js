@@ -1,5 +1,6 @@
 const Plants_Admin = require("../../models/PlantsAdmin.model");
 const cloudinary = require("cloudinary");
+const fs = require("fs");
 
 // Get Plants Admin
 const getPlantsAdmin = async (req, res) => {
@@ -25,33 +26,37 @@ const getPlantsAdmin = async (req, res) => {
 const createAdminPlant = async (req, res) => {
   try {
     const plantData = req.body;
-    const { title } = plantData; // Ensure title is provided
+    const { title } = plantData;
+    // Ensure title and imgs files are provided
     if (!title) {
       return res.status(400).json({ message: "Plant title is required" });
     }
-    const imageUrls = [];
-    if (req.files && req.files.imgs) {
-      const images = Array.isArray(req.files.imgs)
-        ? req.files.imgs
-        : [req.files.imgs];
-      // Upload each image to a Cloudinary folder named after the plant title
-      for (const image of images) {
-        const result = await cloudinary.uploader.upload(image.tempFilePath, {
-          folder: `Plants_Admin/${title}`, // Create a folder using the plant title
-        });
-
-        imageUrls.push(result.secure_url);
-      }
+    // Ensure images are provided
+    if (!req.files || !req.files.length) {
+      // Checking for files array length
+      return res.status(400).json({ message: "Plant image is required" });
     }
-    // Add the image URLs to the plant data
+    const images = req.files;
+    const imageUrls = [];
+    // Upload each image
+    for (const image of images) {
+      const result = await cloudinary.v2.uploader.upload(image.path, {
+        folder: `PlantsAdmin/${title}`, // Fixed folder path
+        use_filename: true,
+        unique_filename: false, // Use the original file name
+      });
+      imageUrls.push(result.secure_url);
+      // Optionally delete the file after uploading
+      fs.unlinkSync(image.path);
+    }
+    // Add image URLs to the plant data
     plantData.imgs = imageUrls;
-
+    // Save plant data to the database
     const newPlant = new Plants_Admin(plantData);
     const savedPlant = await newPlant.save();
-    // console.log("Saved Plant:", savedPlant);
     res
       .status(201)
-      .json({ message: "Plant created successfully", plant: savedPlant });
+      .json({ message: "Plant created successfully:", plant: savedPlant });
   } catch (error) {
     console.error("Error creating plant:", error);
     res.status(500).json({ message: "Error creating plant", error });
@@ -63,15 +68,33 @@ const updateAdminPlant = async (req, res) => {
   try {
     const { id } = req.params;
     const updateData = req.body;
+    // Check if images are provided
+    if (req.files && req.files.length > 0) {
+      const images = req.files;
+      const imageUrls = [];
+      // Upload each image to Cloudinary
+      for (const image of images) {
+        const result = await cloudinary.v2.uploader.upload(image.path, {
+          folder: `PlantsAdmin/${updateData.title || "Untitled"}`,
+          use_filename: true,
+          unique_filename: false,
+        });
+        imageUrls.push(result.secure_url);
+        fs.unlinkSync(image.path); // Remove local file
+      }
+      // Add uploaded image URLs to updateData
+      updateData.imgs = imageUrls;
+    }
+    console.log("Update Data:", updateData);
+    // Update the plant in the database
     const updatedPlant = await Plants_Admin.findByIdAndUpdate(id, updateData, {
       new: true, // Return the updated document
       runValidators: true, // Ensure the updated data adheres to schema validation
     });
-    // If no plant is found, return a 404 error
+    console.log("Updated Plant:", updatedPlant);
     if (!updatedPlant) {
       return res.status(404).json({ message: "Plant not found" });
     }
-    // Return the updated plant
     res.status(200).json({
       message: "Plant updated successfully",
       plant: updatedPlant,

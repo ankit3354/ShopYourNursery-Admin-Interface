@@ -66,7 +66,7 @@ const ShowAllPlantsAdmin = () => {
   };
 
   return (
-    <div className="flex mt-28 gap-8 mx-auto items-start">
+    <div className="flex mt-28 mb-28 gap-8 mx-auto items-start">
       <div className="ml-10">
         <Filter
           filterMap={filterMap}

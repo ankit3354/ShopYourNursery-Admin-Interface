@@ -1,46 +1,63 @@
-import React, { createContext, useContext } from "react";
-import useDeletePlantsAdmin from ".././hooks/useDeleteFromPlantsAdmin";
+import React, { createContext, useContext, ReactNode } from "react";
+import useDeletePlantsAdmin from "../hooks/useDeleteFromPlantsAdmin";
 import useUpdatePlantsAdmin from "@/hooks/useUpdatePlantsAdmin";
 import { useAddPlantsAdmin } from "@/hooks/useAddPlantsAdmin";
 import usePlantsAdmin from "@/hooks/usePlantsAdmin";
-type PlantsAdminProviderProps = {
-  children: React.ReactNode;
+
+// Define a type for the context value
+type PlantsAdminContextType = {
+  someState: object;
+  handleDeletePlantsAdmin: ReturnType<typeof useDeletePlantsAdmin>;
+  handleUpdatePlantsAdmin: ReturnType<typeof useUpdatePlantsAdmin>;
+  handleAddPlantsAdmin: ReturnType<typeof useAddPlantsAdmin>;
+  plants: ReturnType<typeof usePlantsAdmin>["plants"];
+  error: ReturnType<typeof usePlantsAdmin>["error"];
+  isLoading: ReturnType<typeof usePlantsAdmin>["isLoading"];
+  getPlantById: ReturnType<typeof usePlantsAdmin>["getPlantById"];
 };
 
-export const PlantsAdminContext = createContext<any | undefined>(undefined);
+// Define the props for the provider
+type PlantsAdminProviderProps = {
+  children: ReactNode;
+};
 
-export default function PlantsAdminProvider({
-  children,
-}: PlantsAdminProviderProps) {
-  const someState = {};
+// Create the context with an explicit type
+export const PlantsAdminContext = createContext<PlantsAdminContextType | undefined>(undefined);
+
+export default function PlantsAdminProvider({ children }: PlantsAdminProviderProps) {
+  // Hook calls for functionality
+  const someState = {}; // Example placeholder state
   const handleDeletePlantsAdmin = useDeletePlantsAdmin();
   const handleUpdatePlantsAdmin = useUpdatePlantsAdmin();
   const handleAddPlantsAdmin = useAddPlantsAdmin();
   const { plants, error, isLoading, getPlantById } = usePlantsAdmin();
 
+  // Provide the context value
+  const contextValue: PlantsAdminContextType = {
+    someState,
+    handleDeletePlantsAdmin,
+    handleUpdatePlantsAdmin,
+    handleAddPlantsAdmin,
+    plants,
+    error,
+    isLoading,
+    getPlantById,
+  };
+
   return (
-    <PlantsAdminContext.Provider
-      value={{
-        someState,
-        handleDeletePlantsAdmin,
-        handleUpdatePlantsAdmin,
-        handleAddPlantsAdmin,
-        plants,
-        error,
-        isLoading,
-        getPlantById,
-      }}
-    >
+    <PlantsAdminContext.Provider value={contextValue}>
       {children}
     </PlantsAdminContext.Provider>
   );
 }
+
+// Hook to use the context
 export function usePlantsAdminContext() {
   const context = useContext(PlantsAdminContext);
+
   if (!context) {
-    throw new Error(
-      "usePlantsAdminContext must be used within a PlantsAdminProvider"
-    );
+    throw new Error("usePlantsAdminContext must be used within a PlantsAdminProvider");
   }
+
   return context;
 }

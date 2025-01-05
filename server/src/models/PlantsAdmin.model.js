@@ -22,7 +22,7 @@ const plantAdminSchema = new mongoose.Schema(
     place: { type: String },
     growthRate: { type: String },
     benefits: [{ type: String }],
-    imgs: [{ type: String }],
+    imgs: [{ type: String, required: true }],
     nutritionalNeeds: [{ type: String }],
     seasonalAvailability: { type: String },
     propagationMethod: [{ type: String }],

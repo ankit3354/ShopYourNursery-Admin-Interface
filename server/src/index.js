@@ -3,19 +3,12 @@ const express = require("express");
 const connectDB = require("./config/db");
 const apiRoutes = require("./routes/api.routes");
 const cors = require("cors");
-const fileUpload = require("express-fileupload");
 const cloudinary = require("cloudinary").v2;
-
 const app = express();
 const PORT = process.env.PORT || 3003;
 
 // Allowed origins (add other domains if needed)
-const allowedOrigins = [
-  process.env.FE1,
-  process.env.FE2,
-  process.env.FE3,
-  process.env.FE4,
-];
+const allowedOrigins = [process.env.FE1, process.env.FE2];
 // Connect to MongoDB
 connectDB();
 
@@ -23,7 +16,7 @@ connectDB();
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_SRECERT_KEY, // Click 'View API Keys' above to copy your API secret
+  api_secret: process.env.CLOUDINARY_SRECERT_KEY,
 });
 
 // Configure CORS middleware
@@ -40,22 +33,18 @@ app.use(
   })
 );
 
-app.use(
-  fileUpload({
-    useTempFiles: true,
-    tempFileDir: "/tmp/",
-    limits: { fileSize: 50 * 1024 * 1024 }, // 50 MB
-  })
-);
 // Enable preflight requests for all routes
 app.options("*", cors());
 
 // Middleware
 app.use(express.json());
 
+// Increase limit for JSON and URL-encoded data
+app.use(express.json({ limit: "50mb" }));
+app.use(express.urlencoded({ limit: "50mb", extended: true }));
+
 // Routes
 app.use("/api", apiRoutes);
-// app.use("/api", plantsRoutes);
 
 // Start Server
 app.listen(PORT, () => {

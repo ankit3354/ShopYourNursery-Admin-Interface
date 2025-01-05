@@ -6,8 +6,7 @@ const searchPlants = async (req, res) => {
     const filters = req.body.filters;
     const query = queryConstructor(filters);
     //pagination logic
-    console.log("Constructed Query:", query);
-    console.log("Constructed Filter:", filters);
+
     const pageSize = 12;
     const pageNumber = parseInt(filters.page || "1");
     const skip = (pageNumber - 1) * pageSize;
