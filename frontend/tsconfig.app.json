@@ -12,7 +12,8 @@
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]
-    }
+    },
+    "outDir": "./dist" // Specify the output directory for compiled files
   },
   "include": ["src"],
   "exclude": ["node_modules", "dist"]

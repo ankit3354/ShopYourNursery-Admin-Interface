@@ -7,20 +7,6 @@ export const getPlantsAdmin = async () => {
 };
 
 export const createPlantsAdmin = async (formData: FormData) => {
-  // const formData = new FormData();
-  // // Loop through the plantData to append fields
-  // for (const key in plantData) {
-  //   if (key === "imgs") {
-  //     // Append multiple images
-  //     plantData[key].forEach((file: any) => formData.append("imgs", file));
-  //   } else if (Array.isArray(plantData[key])) {
-  //     // Append each array item as a separate field
-  //     plantData[key].forEach((item: any) => formData.append(key, item));
-  //   } else {
-  //     // Append regular fields
-  //     formData.append(key, plantData[key]);
-  //   }
-  // }
   const response = await fetch(`${API_BASE_URL}/api/postInplants_admin`, {
     method: "POST",
     body: formData,
@@ -34,20 +20,6 @@ export const createPlantsAdmin = async (formData: FormData) => {
 };
 
 export const updatePlantsAdmin = async (id: string, formData: FormData) => {
-  // const formData = new FormData();
-  // // Loop through the updateData object to append fields
-  // for (const key in updateData) {
-  //   if (key === "imgs") {
-  //     // Append multiple images
-  //     updateData[key].forEach((file: any) => formData.append("imgs", file));
-  //   } else if (Array.isArray(updateData[key])) {
-  //     // Append each array item as a separate field
-  //     updateData[key].forEach((item: any) => formData.append(key, item));
-  //   } else {
-  //     // Append regular fields
-  //     formData.append(key, updateData[key]);
-  //   }
-  // }
   const response = await fetch(`${API_BASE_URL}/api/plants_admin/${id}`, {
     method: "PUT",
     body: formData,
