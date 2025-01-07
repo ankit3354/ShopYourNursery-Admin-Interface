@@ -42,6 +42,7 @@ const createAdminPlant = async (req, res) => {
     for (const image of images) {
       const result = await cloudinary.v2.uploader.upload(image.path, {
         folder: `PlantsAdmin/${title}`, // Fixed folder path
+        public_id: `${image.originalname.split('.')[0]}_${Date.now()}`,
         use_filename: true,
         unique_filename: false, // Use the original file name
       });

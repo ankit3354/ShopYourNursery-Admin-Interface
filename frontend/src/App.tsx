@@ -10,8 +10,8 @@ function App() {
       <Navbar />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/admin" element={<PlantsAdmin />} />
-        <Route path="/admin/:id" element={<PlantsAdmin />} /> 
+        <Route path="/admin" element={<PlantsAdmin key="add" />} />
+        <Route path="/admin/:id" element={<PlantsAdmin key="edit" />} />
         <Route path="/products" element={<ShowAllPlantsAdmin />} />
       </Routes>
     </Router>

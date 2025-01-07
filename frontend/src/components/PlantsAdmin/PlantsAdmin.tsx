@@ -1,13 +1,15 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { usePlantsAdminContext } from "@/contexts/PlantsAdminProvider";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { TiDelete } from "react-icons/ti";
 
 function PlantsAdmin() {
   const { handleAddPlantsAdmin, handleUpdatePlantsAdmin, getPlantById } =
     usePlantsAdminContext(); // Access the context
   const { id } = useParams();
-
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { addPlant } = handleAddPlantsAdmin;
+  const navigate = useNavigate();
   const initialFormData = {
     title: "",
     description: "",
@@ -36,7 +38,7 @@ function PlantsAdmin() {
     pestResistance: "",
     toxicityLevel: "",
     tag: "",
-    plantTags: "", // Change from [] to ""
+    plantTags: [], // Change from [] to ""
     promotionTags: "",
     plantAccessories: [], // Change from [] to ""
     category: "",
@@ -51,6 +53,7 @@ function PlantsAdmin() {
     nutritionalNeeds: "",
     plantAccessories: "",
     plantCare: "",
+    plantTags: "",
     imgs: [],
   });
 
@@ -58,12 +61,12 @@ function PlantsAdmin() {
     try {
       const plantData = await getPlantById(plantId);
       if (plantData) {
-        // console.log("Fetched Plant Data:", plantData);
+        console.log("Fetched Plant Data:", plantData);
         setFormData(plantData);
         // Extract the image name from the URL
         const imageNames = plantData.imgs.map((imgUrl: string) => {
           const parts = imgUrl.split("/");
-          return parts[parts.length - 1]; // Get the last part of the URL, which is the filename
+          return parts[parts.length - 1];
         });
         // console.log("imageNames", imageNames);
         setInputValues({
@@ -78,6 +81,7 @@ function PlantsAdmin() {
             ? plantData.plantAccessories.join(". ")
             : "",
           plantCare: plantData.plantCare ? plantData.plantCare.join(". ") : "",
+          plantTags: plantData.plantTags ? plantData.plantTags.join(". ") : "",
           imgs: imageNames,
         });
       } else {
@@ -99,13 +103,13 @@ function PlantsAdmin() {
     setFormData((prevData) => {
       let newValue;
       if (type === "file") {
-        const fileArray = Array.from(files || []); // convert Files into an array
+        const fileArray = Array.from(files || []);
         newValue = fileArray;
         // Update inputValues with the filenames of the new files
         const imageNames = fileArray.map((file: any) => file.name);
         setInputValues((prevInputValues: any) => ({
           ...prevInputValues,
-          imgs: imageNames, // Update the imgs field in inputValues
+          imgs: imageNames,
         }));
       } else if (type === "checkbox" && Array.isArray(prevData[name])) {
         const updatedArray = checked
@@ -136,13 +140,11 @@ function PlantsAdmin() {
 
   const handleTextChange = (event: any) => {
     const { name, value } = event.target;
-    setInputValues((prev) => ({ ...prev, [name]: value })); // Update local input value
-    // Split the input value by '.' and trim each part
+    setInputValues((prev) => ({ ...prev, [name]: value }));
     const newArray = value
       .split(".")
       .map((item: any) => item.trim())
       .filter((item: any) => item !== "");
-    // Update the formData state with the new array
     setFormData((prevFormData) => ({
       ...prevFormData,
       [name]: newArray,
@@ -154,11 +156,10 @@ function PlantsAdmin() {
     console.log("Submitted:", formData);
     try {
       const formDataToSend = new FormData();
-      // Append text fields
       for (const key in formData) {
         if (key === "imgs") {
           formData[key].forEach((file: any) => {
-            formDataToSend.append("imgs", file); // Append images as files
+            formDataToSend.append("imgs", file);
           });
         } else if (Array.isArray(formData[key])) {
           formData[key].forEach((item) => {
@@ -175,9 +176,8 @@ function PlantsAdmin() {
         });
         console.log("Plant updated successfully !");
       } else {
-        // console.log("formDataToSend", formDataToSend);
-        const newPlant = await addPlant(formDataToSend); // Pass the FormData here
-        console.log("Plant added successfully:", newPlant);
+        const newPlant = await addPlant(formDataToSend);
+        console.log("Plant added successfully :", newPlant);
       }
       // Reset form data
       setFormData(initialFormData);
@@ -187,11 +187,27 @@ function PlantsAdmin() {
         nutritionalNeeds: "",
         plantAccessories: "",
         plantCare: "",
+        plantTags: "",
         imgs: [],
       });
+      navigate("/admin");
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     } catch (error) {
       console.error("Failed to add plant:", error);
     }
+  };
+
+  const handleRemoveImage = (filename: any) => {
+    setInputValues((prevInputValues) => ({
+      ...prevInputValues,
+      imgs: prevInputValues.imgs.filter((img) => img !== filename),
+    }));
+    setFormData((prevData) => ({
+      ...prevData,
+      imgs: prevData.imgs.filter((file: any) => file.name !== filename),
+    }));
   };
 
   return (
@@ -471,151 +487,39 @@ function PlantsAdmin() {
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
                 onChange={handleTextChange}
               />
-              {/* <select
-                name="benefits"
-                value={formData?.benefits || ""}
-                onChange={handleArrayChange}
-                className="mt-2 p-3 border border-gray-300 rounded w-full bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="">Select Benefits</option>
-                <option value="Known for its lush, attractive foliage">
-                  Known for its lush, attractive foliage
-                </option>
-                <option value="Adds greenery and vibrancy to indoor spaces">
-                  Adds greenery and vibrancy to indoor spaces
-                </option>
-                <option value="Excellent for hanging baskets or as a decorative houseplant">
-                  Excellent for hanging baskets or as a decorative houseplant
-                </option>
-                <option value="Known for its air-purifying qualities">
-                  Known for its air-purifying qualities
-                </option>
-                <option value="Commonly used in tropical and subtropical landscaping">
-                  Commonly used in tropical and subtropical landscaping
-                </option>
-                <option value="Beautiful ornamental plant for fences, trellises, and hanging baskets">
-                  Beautiful ornamental plant for fences, trellises, and hanging
-                  baskets
-                </option>
-                <option value="An ornamental palm, often used in Mediterranean and tropical landscaping">
-                  An ornamental palm, often used in Mediterranean and tropical
-                  landscaping
-                </option>
-                <option value="Adds a tropical flair to outdoor gardens">
-                  Adds a tropical flair to outdoor gardens
-                </option>
-                <option value="Used in Filipino and Southeast Asian cuisine for its tangy fruit">
-                  Used in Filipino and Southeast Asian cuisine for its tangy
-                  fruit
-                </option>
-                <option value="Great for juicing and garnishing">
-                  Great for juicing and garnishing
-                </option>
-                <option value="Often used in landscaping and as a decorative addition to gardens">
-                  Often used in landscaping and as a decorative addition to
-                  gardens
-                </option>
-                <option value="Hardy plant, suitable for xeriscaping">
-                  Hardy plant, suitable for xeriscaping
-                </option>
-                <option value="Aromatic leaves used in Indian cuisine, especially in curries">
-                  Aromatic leaves used in Indian cuisine, especially in curries
-                </option>
-                <option value="Medicinal benefits, such as aiding digestion and reducing inflammation">
-                  Medicinal benefits, such as aiding digestion and reducing
-                  inflammation
-                </option>
-                <option value="Decorative plant for gardens and homes">
-                  Decorative plant for gardens and homes
-                </option>
-                <option value="Suited for tropical and subtropical climates">
-                  Suited for tropical and subtropical climates
-                </option>
-                <option value="Ornamental houseplant known for its striking appearance">
-                  Ornamental houseplant known for its striking appearance
-                </option>
-                <option value="Adds a tropical flair to indoor décor">
-                  Adds a tropical flair to indoor décor
-                </option>
-                <option value="Popular ornamental plant for bonsai enthusiasts">
-                  Popular ornamental plant for bonsai enthusiasts
-                </option>
-                <option value="Adds a unique, artistic touch to indoor spaces">
-                  Adds a unique, artistic touch to indoor spaces
-                </option>
-                <option value="Highly ornamental with large, glossy leaves">
-                  Highly ornamental with large, glossy leaves
-                </option>
-                <option value="Ideal for creating a statement in modern interior design">
-                  Ideal for creating a statement in modern interior design
-                </option>
-                <option value="Excellent for hanging baskets or trailing in decorative pots">
-                  Excellent for hanging baskets or trailing in decorative pots
-                </option>
-                <option value="Known for its air-purifying properties">
-                  Known for its air-purifying properties
-                </option>
-                <option value="Edible fruit used in beverages, jams, and desserts">
-                  Edible fruit used in beverages, jams, and desserts
-                </option>
-                <option value="High in vitamin C, with potential medicinal uses">
-                  High in vitamin C, with potential medicinal uses
-                </option>
-                <option value="Commonly used as an indoor decorative plant">
-                  Commonly used as an indoor decorative plant
-                </option>
-                <option value="Known for its air-purifying properties, making it ideal for improving indoor air quality">
-                  Known for its air-purifying properties, making it ideal for
-                  improving indoor air quality
-                </option>
-                <option value="Widely used in Feng Shui for attracting good luck and positive energy">
-                  Widely used in Feng Shui for attracting good luck and positive
-                  energy
-                </option>
-                <option value="Popular as a houseplant or office decoration">
-                  Popular as a houseplant or office decoration
-                </option>
-                <option value="Edible fruit used in a variety of dishes, including juices, salads, and desserts">
-                  Edible fruit used in a variety of dishes, including juices,
-                  salads, and desserts
-                </option>
-                <option value="The tree provides shade and is an ornamental addition to gardens">
-                  The tree provides shade and is an ornamental addition to
-                  gardens
-                </option>
-                <option value="Known as a symbol of good luck and prosperity">
-                  Known as a symbol of good luck and prosperity
-                </option>
-                <option value="Popular in Feng Shui practices for bringing positive energy">
-                  Popular in Feng Shui practices for bringing positive energy
-                </option>
-                <option value="Ornamental vine with striking, fenestrated leaves">
-                  Ornamental vine with striking, fenestrated leaves
-                </option>
-                <option value="Ideal for indoor decoration, adding a tropical touch">
-                  Ideal for indoor decoration, adding a tropical touch
-                </option>
-                <option value="Decorative tree with symmetrical foliage">
-                  Decorative tree with symmetrical foliage
-                </option>
-                <option value="Often used as a Christmas tree due to its attractive appearance">
-                  Often used as a Christmas tree due to its attractive
-                  appearance
-                </option>
-              </select> */}
             </div>
             {/* Images */}
             <div>
               <label className="block text-lg font-medium text-gray-700">
-                Upload Img
+                Upload Images
               </label>
-              <input
-                type="file"
-                name="imgs"
-                onChange={handleChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-                multiple
-              />
+              <div className="flex flex-wrap mt-2 p-3 gap-3 rounded w-full overflow-hidden border border-gray-300 bg-white text-gray-700 hover:ring-2 hover:ring-[#7AA363] hover:outline-none">
+                <div className="w-fit flex items-center ">
+                  <input
+                    type="file"
+                    name="imgs"
+                    onChange={handleChange}
+                    multiple
+                    ref={fileInputRef}
+                  />
+                </div>
+                <div className="w-full flex flex-wrap gap-2 ">
+                  {inputValues.imgs.map((filename) => (
+                    <div
+                      key={filename}
+                      className="flex justify-center items-center px-2 py-1 border-[1px] border-gray-300 rounded-lg"
+                    >
+                      <span className="text-gray-800 font-medium text-[14px]">
+                        {filename}
+                      </span>
+                      <TiDelete
+                        onClick={() => handleRemoveImage(filename)}
+                        className="hover:text-[#7AA363] text-[16px] cursor-pointer"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
             {/*  Nutritional Needs */}
             <div>
@@ -630,64 +534,6 @@ function PlantsAdmin() {
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
                 onChange={handleTextChange}
               />
-              {/* <select
-                name="nutritionalNeeds"
-                value={formData?.nutritionalNeeds || ""}
-                onChange={handleArrayChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="">Select Nutritional Needs</option>
-                <option
-                  value="Enrich the soil with organic matter for
-                  better growth"
-                >
-                  Enrich the soil with organic matter for better growth
-                </option>
-                <option value="Feed with a balanced liquid fertilizer every 6-8 weeks during the growing season">
-                  Feed with a balanced liquid fertilizer every 6-8 weeks during
-                  the growing season
-                </option>
-                <option value="Ferns also benefit from occasional misting to provide extra humidity">
-                  Ferns also benefit from occasional misting to provide extra
-                  humidity
-                </option>
-                <option
-                  value=" Feed with a balanced fertilizer once every month during the
-                  growing season"
-                >
-                  Feed with a balanced fertilizer once every month during the
-                  growing season
-                </option>
-                <option value="Requires occasional feeding during the blooming season, especially with a low-nitrogen fertilizer">
-                  Requires occasional feeding during the blooming season,
-                  especially with a low-nitrogen fertilizer
-                </option>
-                <option value="Bougainvillea benefits from added compost or organic matter to encourage vibrant blooms">
-                  Bougainvillea benefits from added compost or organic matter to
-                  encourage vibrant blooms
-                </option>
-                <option value="Feed every month during the growing season with a balanced liquid fertilizer">
-                  Feed every month during the growing season with a balanced
-                  liquid fertilizer
-                </option>
-                <option
-                  value="Avoid heavy fertilizing during the winter
-                  months"
-                >
-                  Avoid heavy fertilizing during the winter months
-                </option>
-                <option value="Calamondin trees also benefit from occasional compost application to boost soil fertility">
-                  Calamondin trees also benefit from occasional compost
-                  application to boost soil fertility
-                </option>
-                <option
-                  value="Feed with a balanced citrus fertilizer every 4-6 weeks during
-                  the growing season"
-                >
-                  Feed with a balanced citrus fertilizer every 4-6 weeks during
-                  the growing season
-                </option>
-              </select> */}
             </div>
             {/* Seasonal Availability */}
             <div>
@@ -777,28 +623,14 @@ function PlantsAdmin() {
               <label className="block text-lg font-medium text-gray-700">
                 Plant Tags
               </label>
-              <select
+              <input
+                type="text"
                 name="plantTags"
-                value={formData?.plantTags || ""}
-                onChange={handleArrayChange}
+                placeholder="Enter Plants Tags"
+                value={inputValues.plantTags}
                 className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="">Select Tag</option>
-                <option value="Superfood plants, drought-tolerant, multipurpose trees, fast-growing plants.">
-                  Superfood plants, drought-tolerant, multipurpose trees,
-                  fast-growing plants.
-                </option>
-                <option value="Berry plants, silkworm trees, edible fruits, hardy plants.">
-                  Berry plants, silkworm trees, edible fruits, hardy plants.
-                </option>
-                <option value="Citrus fruits, refreshing juice, vitamin C, tropical gardening.">
-                  Citrus fruits, refreshing juice, vitamin C, tropical
-                  gardening.
-                </option>
-                <option value="Fruit trees, tropical plants, hardy plants, medicinal plants.">
-                  Fruit trees, tropical plants, hardy plants, medicinal plants.
-                </option>
-              </select>
+                onChange={handleTextChange}
+              />
             </div>
             {/* PromotionTags */}
             <div>
@@ -844,7 +676,6 @@ function PlantsAdmin() {
                 <option value="Trees & Shrubs">Trees & Shrubs</option>
               </select>
             </div>
-
             {/* Plant Care  */}
             <div>
               <label className="block text-lg font-medium text-gray-700">
