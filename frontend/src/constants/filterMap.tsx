@@ -21,7 +21,7 @@ export const place = {
 export const customerRating = {
   title: "Customer Rating",
   type: "rating",
-  value: [5, 4, 3, 2, 1],
+  value: [4, 3, 2, 1],
 };
 export const categories = {
   title: "Category",
