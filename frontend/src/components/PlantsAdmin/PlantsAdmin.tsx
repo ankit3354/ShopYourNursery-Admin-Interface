@@ -2,6 +2,8 @@ import React, { useEffect, useState, useRef } from "react";
 import { usePlantsAdminContext } from "@/contexts/PlantsAdminProvider";
 import { useParams, useNavigate } from "react-router-dom";
 import { TiDelete } from "react-icons/ti";
+import edit from "../../assets/AdminForm/clarity_note-edit-solid.svg";
+import uplaod from "../../assets/AdminForm/et_upload.svg";
 
 function PlantsAdmin() {
   const { handleAddPlantsAdmin, handleUpdatePlantsAdmin, getPlantById } =
@@ -212,492 +214,536 @@ function PlantsAdmin() {
 
   return (
     <div className="bg-gray-100 min-h-screen p-6 border-[1px] ">
-      <div className="max-w-6xl mx-auto bg-white p-8 rounded-lg shadow-lg mt-20">
-        <h1 className="text-xl font-semibold text-[#7AA363] mb-8 text-center">
-          {id ? "Edit Plant" : "Add New Plant"}
-        </h1>
-        {/* form */}
+      <div className="w-[1200px] mx-auto bg-[#F5F5F5] rounded-lg mt-20">
         <form
           action="/api/postInplants_admin"
           method="post"
           onSubmit={handleSubmit}
           encType="multipart/form-data"
+          className="flex gap-12 flex-col"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Title */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Title
-              </label>
-              <input
-                type="text"
-                name="title"
-                value={formData.title || ""}
-                onChange={handleChange}
-                required
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              />
-            </div>
-            {/* Price */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Price
-              </label>
-              <input
-                type="number"
-                name="price"
-                value={formData.price || ""}
-                onChange={handleChange}
-                required
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              />
-            </div>
-            {/* Description */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Description
-              </label>
-              <textarea
-                name="description"
-                value={formData.description || ""}
-                onChange={handleChange}
-                required
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              />
-            </div>
-            {/* Discount Percentage */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Discount Percentage
-              </label>
-              <input
-                type="number"
-                name="discountPercentage"
-                value={formData.discountPercentage || ""}
-                onChange={handleChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              />
-            </div>
-            {/* Marked Price */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Marked Price
-              </label>
-              <input
-                type="number"
-                name="markedPrice"
-                value={formData.markedPrice || ""}
-                onChange={handleChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              />
-            </div>
-            {/* Quantity */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Quantity
-              </label>
-              <input
-                type="number"
-                name="quantity"
-                value={formData.quantity || ""}
-                onChange={handleChange}
-                required
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              />
-            </div>
-            {/* Featured Dropdown */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Featured
-              </label>
-              <select
-                name="featured"
-                value={formData.featured ? "true" : "false"}
-                onChange={handleChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="true">True</option>
-                <option value="false">False</option>
-              </select>
-            </div>
-            {/* Popular Dropdown */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Popular
-              </label>
-              <select
-                name="popular"
-                value={formData?.popular ? "true" : "false"}
-                onChange={handleChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="true">True</option>
-                <option value="false">False</option>
-              </select>
-            </div>
-            {/* Size */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Size
-              </label>
-              <div className="mt-2 space-y-2">
-                {["Small", "Medium", "Large"].map((sizeOption) => (
-                  <div key={sizeOption} className="flex  items-center">
-                    <input
-                      type="checkbox"
-                      id={`size-${sizeOption}`}
-                      name="size"
-                      value={sizeOption.toLowerCase()}
-                      checked={formData.size.includes(sizeOption.toLowerCase())}
-                      onChange={handleChange}
-                      className="h-4 w-4 text-[#7AA363] border-gray-300 rounded focus:ring-2 focus:ring-[#7AA363]"
-                    />
-                    <label
-                      htmlFor={`size-${sizeOption}`}
-                      className="ml-2 text-sm text-gray-700"
-                    >
-                      {sizeOption}
-                    </label>
-                  </div>
-                ))}
+          <div className="flex justify-between items-center">
+            <h1 className="text-[20px] font-medium font-['Poppins']">
+              Monstera Deliciosa
+            </h1>
+            <div className="flex items-start gap-[12px]">
+              <div className="flex gap-[10px] justify-center items-center p-[10px] bg-[#7AA262] rounded-[8px] shadow-md shadow-gray-500/50 cursor-pointer hover:bg-[#51912d] active:bg-[#7AA262]focus:outline-none focus:ring-2 focus:ring-[#b6f392] focus:ring-offset-2 transition">
+                <img src={edit} alt="" />
+                <button className="text-[12px] font-['Poppins'] text-white font-normal">
+                  Edit
+                </button>
               </div>
-            </div>
-            {/* Sunlight Requirement */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Sunlight Requirement
-              </label>
-              <select
-                name="sunlightRequirement"
-                value={formData?.sunlightRequirement || ""}
-                onChange={handleChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="partial-sun">Partial Sun / Partial Shade</option>
-                <option value="full-sun">Full Sun</option>
-                <option value="shade">Shade</option>
-                <option value="indirect-light">Indirect Light</option>
-                <option value="low-light">Low Light</option>
-              </select>
-            </div>
-            {/* Water Frequency */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Water Frequency
-              </label>
-              <select
-                name="waterFrequency"
-                value={formData?.waterFrequency || ""}
-                onChange={handleChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="partial-sun">Partial Sun / Partial Shade</option>
-                <option value="full-sun">Full Sun</option>
-                <option value="shade">Shade</option>
-                <option value="indirect-light">Indirect Light</option>
-                <option value="low-light">Low Light</option>
-              </select>
-            </div>
-            {/* Water Frequency Description */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Water Frequency Description
-              </label>
-              <input
-                type="text"
-                name="waterFrequencyDescription"
-                value={inputValues.waterFrequencyDescription}
-                placeholder="Enter 5 Water Frequency Descriptions"
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-                onChange={handleTextChange}
-              />
-            </div>
-            {/* Growth Rate */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Growth Rate
-              </label>
-              <select
-                name="growthRate"
-                value={formData?.growthRate || ""}
-                onChange={handleChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="Fast">Fast</option>
-                <option value="Moderate">Moderate</option>
-                <option value="Slow">Slow</option>
-              </select>
-            </div>
-            {/* Replacement Available */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Replacement Available
-              </label>
-              <select
-                name="replacementAvailable"
-                value={formData?.replacementAvailable ? "true" : "false"}
-                onChange={handleChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="true">True</option>
-                <option value="false">False</option>
-              </select>
-            </div>
-            {/* PreOrder Status*/}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Preorder Status
-              </label>
-              <select
-                name="preOrderStatus"
-                value={formData?.preOrderStatus ? "true" : "false"}
-                onChange={handleChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="true">True</option>
-                <option value="false">False</option>
-              </select>
-            </div>
-            {/* place*/}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Place
-              </label>
-              <select
-                name="place"
-                value={formData?.place || ""}
-                onChange={handleArrayChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="Indoor">Indoor</option>
-                <option value="Outdoor">Outdoor</option>
-                <option value="Pet Friendly">Pet Friendly</option>
-              </select>
-            </div>
-            {/* Benefits */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Benefits
-              </label>
-              <input
-                type="text"
-                name="benefits"
-                placeholder="Enter 5 Plant Benefits"
-                value={inputValues.benefits}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-                onChange={handleTextChange}
-              />
-            </div>
-            {/* Images */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Upload Images
-              </label>
-              <div className="flex flex-wrap mt-2 p-3 gap-3 rounded w-full overflow-hidden border border-gray-300 bg-white text-gray-700 hover:ring-2 hover:ring-[#7AA363] hover:outline-none">
-                <div className="w-fit flex items-center ">
-                  <input
-                    type="file"
-                    name="imgs"
-                    onChange={handleChange}
-                    multiple
-                    ref={fileInputRef}
-                  />
-                </div>
-                <div className="w-full flex flex-wrap gap-2 ">
-                  {inputValues.imgs.map((filename) => (
-                    <div
-                      key={filename}
-                      className="flex justify-center items-center px-2 py-1 border-[1px] border-gray-300 rounded-lg"
-                    >
-                      <span className="text-gray-800 font-medium text-[14px]">
-                        {filename}
-                      </span>
-                      <TiDelete
-                        onClick={() => handleRemoveImage(filename)}
-                        className="hover:text-[#7AA363] text-[16px] cursor-pointer"
-                      />
-                    </div>
-                  ))}
-                </div>
+
+              <div className="flex gap-[10px] justify-center items-center p-[10px] bg-[#FF5E5E] rounded-[8px] shadow-md shadow-gray-500/50 cursor-pointer hover:bg-red-600 active:bg-[#972a2a]focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 transition">
+                <button className="text-[12px] font-['Poppins'] text-white font-normal">
+                  Delete
+                </button>
               </div>
-            </div>
-            {/*  Nutritional Needs */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Nutritional Needs
-              </label>
-              <input
-                type="text"
-                name="nutritionalNeeds"
-                placeholder="Enter 5 Nutritional Needs"
-                value={inputValues.nutritionalNeeds}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-                onChange={handleTextChange}
-              />
-            </div>
-            {/* Seasonal Availability */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Seasonal Availability
-              </label>
-              <select
-                name="seasonalAvailability"
-                value={formData?.seasonalAvailability || ""}
-                onChange={handleChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="">Select Availability</option>
-                <option value="All-Year-Round">All-Year-Round</option>
-                <option value="Spring">Spring</option>
-                <option value="Summer">Summer</option>
-                <option value="Fall">Fall</option>
-              </select>
-            </div>
-            {/* Propagation Method */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Propagation Method
-              </label>
-              <select
-                name="propagationMethod"
-                value={formData.propagationMethod || ""}
-                onChange={handleArrayChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="">Select Propagation Method</option>
-                <option value="Cuttings, Seeds">Cuttings, Seeds</option>
-                <option value="Cuttings">Cuttings</option>
-                <option value="Seeds, Grafting">Seeds, Grafting</option>
-                <option value="Seeds">Seeds</option>
-              </select>
-            </div>
-            {/* Pest Resistance */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Pest Resistance
-              </label>
-              <select
-                name="pestResistance"
-                value={formData?.pestResistance || ""}
-                onChange={handleArrayChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="">Select Pest Resistance</option>
-                <option value="High">High</option>
-                <option value="Moderate">Moderate</option>
-              </select>
-            </div>
-            {/* Toxicity Level */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Toxicity Level
-              </label>
-              <select
-                name="toxicityLevel"
-                value={formData?.toxicityLevel || ""}
-                onChange={handleArrayChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="">Select Toxicity Level</option>
-                <option value="Non-toxic">Non-toxic </option>
-              </select>
-            </div>
-            {/* Tag  */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Tag
-              </label>
-              <select
-                name="tag"
-                value={formData?.tag || ""}
-                onChange={handleArrayChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="">Select Tag</option>
-                <option value="Trending Now">Trending Now</option>
-                <option value="On Sale">On Sale</option>
-              </select>
-            </div>
-            {/* Plant Tags */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Plant Tags
-              </label>
-              <input
-                type="text"
-                name="plantTags"
-                placeholder="Enter Plants Tags"
-                value={inputValues.plantTags}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-                onChange={handleTextChange}
-              />
-            </div>
-            {/* PromotionTags */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                PromotionTags
-              </label>
-              <select
-                name="promotionTags"
-                value={formData?.promotionTags || ""}
-                onChange={handleArrayChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="">Select Promotion Tag</option>
-                <option value="Hot Deals">Hot Deals</option>
-              </select>
-            </div>
-            {/* Plant Accessories   */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Plant Accessories
-              </label>
-              <input
-                type="text"
-                name="plantAccessories"
-                placeholder="Enter 5 Nutritional Needs"
-                value={inputValues.plantAccessories}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-                onChange={handleTextChange}
-              />
-            </div>
-            {/* Category  */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Category
-              </label>
-              <select
-                name="category"
-                value={formData?.category || ""}
-                onChange={handleArrayChange}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-              >
-                <option value="">Select Category</option>
-                <option value="Trees & Shrubs">Trees & Shrubs</option>
-              </select>
-            </div>
-            {/* Plant Care  */}
-            <div>
-              <label className="block text-lg font-medium text-gray-700">
-                Plant Care
-              </label>
-              <input
-                type="text"
-                name="plantCare"
-                placeholder="Enter 5 Nutritional Needs"
-                value={inputValues.plantCare}
-                className="mt-2 p-3 rounded w-full border border-gray-300 bg-white text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-                onChange={handleTextChange}
-              />
             </div>
           </div>
-          <div className="text-center">
+
+          <div className="grid grid-cols-1 gap-5 md:grid-cols-2 ">
+            {/* Left*/}
+            <div className="flex flex-col items-start gap-[30px] ">
+              {/* Images */}
+              <div className="h-[341px] w-[411px] px-[84px] py-[140px] bg-[#FEFEFE] rounded-[10px] border-[1px] border-dashed border-[#638424]">
+                <div className="flex flex-col gap-[14px] items-center justify-center self-stretch">
+                  <img src={uplaod} alt="uplaod-Image" />
+                  <div className="flex flex-col items-center self-stretch gap-[10px]">
+                    <h1 className="text-[14px] leading-normal font-['Poppins'] font-medium text-center text-black">
+                      Image
+                    </h1>
+                    <div className="">
+                      <div className="flex items-center">
+                        <input
+                          type="file"
+                          name="imgs"
+                          onChange={handleChange}
+                          multiple
+                          ref={fileInputRef}
+                        />
+                      </div>
+                      <div className="w-full flex flex-wrap">
+                        {inputValues.imgs.map((filename) => (
+                          <div
+                            key={filename}
+                            className="flex justify-center items-center px-2 py-1 border-[1px] border-gray-300 rounded-lg"
+                          >
+                            <span className="text-gray-800 font-medium text-[14px]">
+                              {filename}
+                            </span>
+                            <TiDelete
+                              onClick={() => handleRemoveImage(filename)}
+                              className="hover:text-[#7AA363] text-[16px] cursor-pointer"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {/* Left Bottom  */}
+              <div className="flex flex-col gap-5 w-[411px]">
+                {/* Size */}
+                <div className="flex items-center gap-5 w-[411px]">
+                  <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                    Size:
+                  </label>
+                  <div className="flex gap-2 shrink-0 w-[w-[191px]]">
+                    {["Small", "Medium", "Large"].map((sizeOption) => (
+                      <div key={sizeOption} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={`size-${sizeOption}`}
+                          name="size"
+                          value={sizeOption.toLowerCase()}
+                          checked={formData.size.includes(
+                            sizeOption.toLowerCase()
+                          )}
+                          onChange={handleChange}
+                          className="h-[20px] w-[20px] text-[#7AA363] border-gray-300 rounded focus:ring-2 focus:ring-[#7AA363]"
+                        />
+                        <label
+                          htmlFor={`size-${sizeOption}`}
+                          className="ml-2 text-sm text-gray-700"
+                        >
+                          {sizeOption}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                {/* Quantity */}
+                <div className="flex items-center gap-5 w-[411px]">
+                  <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                    Quantity:
+                  </label>
+                  <input
+                    type="number"
+                    name="quantity"
+                    value={formData.quantity || ""}
+                    onChange={handleChange}
+                    required
+                    className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                  />
+                </div>
+                {/* Price */}
+                <div className="flex items-center gap-5 w-[411px]">
+                  <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                    Price:
+                  </label>
+                  <input
+                    type="number"
+                    name="price"
+                    value={formData.price || ""}
+                    onChange={handleChange}
+                    required
+                    className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                  />
+                </div>
+                {/* Marked Price */}
+                <div className="flex items-center gap-5 w-[411px]">
+                  <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                    Marked Price:
+                  </label>
+                  <input
+                    type="number"
+                    name="markedPrice"
+                    value={formData.markedPrice || ""}
+                    onChange={handleChange}
+                    className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                  />
+                </div>
+                {/* place*/}
+                <div className="flex items-center gap-5 w-[411px]">
+                  <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                    Place:
+                  </label>
+                  <select
+                    name="place"
+                    value={formData?.place || ""}
+                    onChange={handleArrayChange}
+                    className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none "
+                  >
+                    <option value="Indoor">Indoor</option>
+                    <option value="Outdoor">Outdoor</option>
+                    <option value="Pet Friendly">Pet Friendly</option>
+                  </select>
+                </div>
+                {/* Discount Percentage */}
+                <div className="flex items-center gap-5 w-[411px]">
+                  <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                    Discount Percentage:
+                  </label>
+                  <input
+                    type="number"
+                    name="discountPercentage"
+                    value={formData.discountPercentage || ""}
+                    onChange={handleChange}
+                    className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                  />
+                </div>
+                {/* Growth Rate */}
+                <div className="flex items-center gap-5 w-[411px]">
+                  <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                    Growth Rate:
+                  </label>
+                  <select
+                    name="growthRate"
+                    value={formData?.growthRate || ""}
+                    onChange={handleChange}
+                    className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                  >
+                    <option value="Fast">Fast</option>
+                    <option value="Moderate">Moderate</option>
+                    <option value="Slow">Slow</option>
+                  </select>
+                </div>
+                {/* Replacement Available */}
+                <div className="flex items-center gap-5 w-[411px]">
+                  <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                    Replacement Available:
+                  </label>
+                  <select
+                    name="replacementAvailable"
+                    value={formData?.replacementAvailable ? "true" : "false"}
+                    onChange={handleChange}
+                    className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                  >
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                  </select>
+                </div>
+                {/* PreOrder Status */}
+                <div className="flex items-center gap-5 w-[411px]">
+                  <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                    Preorder Status:
+                  </label>
+                  <select
+                    name="preOrderStatus"
+                    value={formData?.preOrderStatus ? "true" : "false"}
+                    onChange={handleChange}
+                    className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                  >
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                  </select>
+                </div>
+                {/* Featured */}
+                <div className="flex items-center gap-5 w-[411px]">
+                  <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                    Featured:
+                  </label>
+                  <select
+                    name="featured"
+                    value={formData.featured ? "true" : "false"}
+                    onChange={handleChange}
+                    className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                  >
+                    <option value="true">True</option>
+                    <option value="false">False</option>
+                  </select>
+                </div>
+                {/* Seasonal Availability */}
+                <div className="flex items-center gap-5">
+                  <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                    Seasonal Availability:
+                  </label>
+                  <select
+                    name="seasonalAvailability"
+                    value={formData?.seasonalAvailability || ""}
+                    onChange={handleChange}
+                    className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                  >
+                    <option value="">Select Availability</option>
+                    <option value="All-Year-Round">All-Year-Round</option>
+                    <option value="Spring">Spring</option>
+                    <option value="Summer">Summer</option>
+                    <option value="Fall">Fall</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            {/* Right */}
+            <div className="flex flex-col gap-5">
+              {/* Title */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Title&nbsp;&nbsp;:
+                </label>
+                <input
+                  type="text"
+                  name="title"
+                  id="title"
+                  value={formData.title || ""}
+                  onChange={handleChange}
+                  required
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                />
+              </div>
+              {/* Category  */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Category&nbsp;&nbsp;:
+                </label>
+                <select
+                  name="category"
+                  value={formData?.category || ""}
+                  onChange={handleArrayChange}
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                >
+                  <option value="">Select Category</option>
+                  <option value="Trees & Shrubs">Trees & Shrubs</option>
+                </select>
+              </div>
+              {/* Water Frequency */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Water Frequency&nbsp;&nbsp;:
+                </label>
+                <select
+                  name="waterFrequency"
+                  value={formData?.waterFrequency || ""}
+                  onChange={handleChange}
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                >
+                  <option value="partial-sun">
+                    Partial Sun / Partial Shade
+                  </option>
+                  <option value="full-sun">Full Sun</option>
+                  <option value="shade">Shade</option>
+                  <option value="indirect-light">Indirect Light</option>
+                  <option value="low-light">Low Light</option>
+                </select>
+              </div>
+              {/* Water Frequency Description */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Water Frequency Description&nbsp;&nbsp;:
+                </label>
+                <input
+                  type="text"
+                  name="waterFrequencyDescription"
+                  value={inputValues.waterFrequencyDescription}
+                  placeholder="Enter Water Frequency Descriptions"
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                  onChange={handleTextChange}
+                />
+              </div>
+              {/* Benefits */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Benefits&nbsp;&nbsp;:
+                </label>
+                <input
+                  type="text"
+                  name="benefits"
+                  placeholder="Enter 5 Plant Benefits"
+                  value={inputValues.benefits}
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                  onChange={handleTextChange}
+                />
+              </div>
+              {/* Nutritional Needs */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Nutritional Needs&nbsp;&nbsp;:
+                </label>
+                <input
+                  type="text"
+                  name="nutritionalNeeds"
+                  placeholder="Enter 5 Nutritional Needs"
+                  value={inputValues.nutritionalNeeds}
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                  onChange={handleTextChange}
+                />
+              </div>
+              {/* Propagation Method */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Propagation Method&nbsp;&nbsp;:
+                </label>
+                <select
+                  name="propagationMethod"
+                  value={formData.propagationMethod || ""}
+                  onChange={handleArrayChange}
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                >
+                  <option value="">Select Propagation Method</option>
+                  <option value="Cuttings, Seeds">Cuttings, Seeds</option>
+                  <option value="Cuttings">Cuttings</option>
+                  <option value="Seeds, Grafting">Seeds, Grafting</option>
+                  <option value="Seeds">Seeds</option>
+                </select>
+              </div>
+              {/* Pest Resistance */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Pest Resistance&nbsp;&nbsp;:
+                </label>
+                <select
+                  name="pestResistance"
+                  value={formData?.pestResistance || ""}
+                  onChange={handleArrayChange}
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                >
+                  <option value="">Select Pest Resistance</option>
+                  <option value="High">High</option>
+                  <option value="Moderate">Moderate</option>
+                </select>
+              </div>
+              {/* Toxicity Level */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Toxicity Level&nbsp;&nbsp;:
+                </label>
+                <select
+                  name="toxicityLevel"
+                  value={formData?.toxicityLevel || ""}
+                  onChange={handleArrayChange}
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                >
+                  <option value="">Select Toxicity Level</option>
+                  <option value="Non-toxic">Non-toxic</option>
+                </select>
+              </div>
+              {/* Sunlight Requirement */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Sunlight Requirement&nbsp;&nbsp;:
+                </label>
+                <select
+                  name="sunlightRequirement"
+                  value={formData?.sunlightRequirement || ""}
+                  onChange={handleChange}
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                >
+                  <option value="partial-sun">
+                    Partial Sun / Partial Shade
+                  </option>
+                  <option value="full-sun">Full Sun</option>
+                  <option value="shade">Shade</option>
+                  <option value="indirect-light">Indirect Light</option>
+                  <option value="low-light">Low Light</option>
+                </select>
+              </div>
+              {/* Tag */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Tag&nbsp;&nbsp;:
+                </label>
+                <select
+                  name="tag"
+                  value={formData?.tag || ""}
+                  onChange={handleArrayChange}
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                >
+                  <option value="">Select Tag</option>
+                  <option value="Trending Now">Trending Now</option>
+                  <option value="On Sale">On Sale</option>
+                </select>
+              </div>
+              {/* Promotion Tags */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Promotion Tags&nbsp;&nbsp;:
+                </label>
+                <select
+                  name="promotionTags"
+                  value={formData?.promotionTags || ""}
+                  onChange={handleArrayChange}
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                >
+                  <option value="">Select Promotion Tag</option>
+                  <option value="Hot Deals">Hot Deals</option>
+                </select>
+              </div>
+              {/* Plant Tags */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Plant Tags&nbsp;&nbsp;:
+                </label>
+                <input
+                  type="text"
+                  name="plantTags"
+                  placeholder="Enter Plants Tags"
+                  value={inputValues.plantTags}
+                  onChange={handleTextChange}
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                />
+              </div>
+              {/* Plant Accessories */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Plant Accessories&nbsp;&nbsp;:
+                </label>
+                <input
+                  type="text"
+                  name="plantAccessories"
+                  placeholder="Enter 5 Nutritional Needs"
+                  value={inputValues.plantAccessories}
+                  onChange={handleTextChange}
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                />
+              </div>
+              {/* Plant Care */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Plant Care&nbsp;&nbsp;:
+                </label>
+                <input
+                  type="text"
+                  name="plantCare"
+                  placeholder="Enter 5 Nutritional Needs"
+                  value={inputValues.plantCare}
+                  onChange={handleTextChange}
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                />
+              </div>
+              {/* Popular Dropdown */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Popular&nbsp;&nbsp;:
+                </label>
+                <select
+                  name="popular"
+                  value={formData?.popular ? "true" : "false"}
+                  onChange={handleChange}
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                >
+                  <option value="true">True</option>
+                  <option value="false">False</option>
+                </select>
+              </div>
+              {/* Description */}
+              <div className="flex items-center gap-5 w-[560px]">
+                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                  Description
+                </label>
+                <textarea
+                  name="description"
+                  value={formData.description || ""}
+                  onChange={handleChange}
+                  required
+                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[104px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="text-center flex items-center justify-center gap-[16px]">
             <button
               type="submit"
-              className="mt-6 w-36 text-xl py-3 bg-[#7AA363] text-white rounded-md hover:bg-[#83ce58] transition duration-300 font-medium"
+              className="w-36 text-xl h-[44px] bg-[#7AA363] text-white rounded-md duration-300 font-medium hover:bg-[#51912d] active:bg-[#7AA262]focus:outline-none focus:ring-2 focus:ring-[#b6f392] focus:ring-offset-2 transition shadow-lg"
             >
               {id ? "Update Plant" : "Add Plant"}
             </button>
+            {id && (
+              <button className="w-36 text-xl h-[44px] bg-[#fff] text-black rounded-md duration-300 font-medium hover:bg-[#c1c1c1] active:bg-[#7AA262]focus:outline-none focus:ring-2 focus:ring-[#b6f392] focus:ring-offset-2 transition shadow-lg">
+                {"Cancel"}
+              </button>
+            )}
           </div>
         </form>
       </div>
