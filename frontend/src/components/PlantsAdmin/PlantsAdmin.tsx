@@ -1,9 +1,10 @@
 import React, { useEffect, useState, useRef } from "react";
 import { usePlantsAdminContext } from "@/contexts/PlantsAdminProvider";
 import { useParams, useNavigate } from "react-router-dom";
-import { TiDelete } from "react-icons/ti";
-import edit from "../../assets/AdminForm/clarity_note-edit-solid.svg";
 import uplaod from "../../assets/AdminForm/et_upload.svg";
+import { FaAngleLeft } from "react-icons/fa6";
+import { FaAngleRight } from "react-icons/fa6";
+import { TiDelete } from "react-icons/ti";
 
 function PlantsAdmin() {
   const { handleAddPlantsAdmin, handleUpdatePlantsAdmin, getPlantById } =
@@ -12,6 +13,8 @@ function PlantsAdmin() {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { addPlant } = handleAddPlantsAdmin;
   const navigate = useNavigate();
+  const [currentIndex, setCurrentIndex] = useState(0);
+
   const initialFormData = {
     title: "",
     description: "",
@@ -200,6 +203,22 @@ function PlantsAdmin() {
       console.error("Failed to add plant:", error);
     }
   };
+  const handleClear = () => {
+    setFormData(initialFormData);
+    setInputValues({
+      waterFrequencyDescription: "",
+      benefits: "",
+      nutritionalNeeds: "",
+      plantAccessories: "",
+      plantCare: "",
+      plantTags: "",
+      imgs: [],
+    });
+    // Clear file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const handleRemoveImage = (filename: any) => {
     setInputValues((prevInputValues) => ({
@@ -212,8 +231,19 @@ function PlantsAdmin() {
     }));
   };
 
+  const handlePrev = () => {
+    setCurrentIndex(
+      (prevIndex) =>
+        (prevIndex - 1 + inputValues.imgs.length) % inputValues.imgs.length
+    );
+  };
+
+  const handleNext = () => {
+    setCurrentIndex((prevIndex) => (prevIndex + 1) % inputValues.imgs.length);
+  };
+
   return (
-    <div className="bg-gray-100 min-h-screen p-6 border-[1px] ">
+    <div className="bg-gray-100 min-h-screen p-6 border-[1px] font-['Poppins']">
       <div className="w-[1200px] mx-auto bg-[#F5F5F5] rounded-lg mt-20">
         <form
           action="/api/postInplants_admin"
@@ -226,63 +256,122 @@ function PlantsAdmin() {
             <h1 className="text-[20px] font-medium font-['Poppins']">
               Monstera Deliciosa
             </h1>
-            <div className="flex items-start gap-[12px]">
-              <div className="flex gap-[10px] justify-center items-center p-[10px] bg-[#7AA262] rounded-[8px] shadow-md shadow-gray-500/50 cursor-pointer hover:bg-[#51912d] active:bg-[#7AA262]focus:outline-none focus:ring-2 focus:ring-[#b6f392] focus:ring-offset-2 transition">
-                <img src={edit} alt="" />
-                <button className="text-[12px] font-['Poppins'] text-white font-normal">
-                  Edit
-                </button>
-              </div>
-
-              <div className="flex gap-[10px] justify-center items-center p-[10px] bg-[#FF5E5E] rounded-[8px] shadow-md shadow-gray-500/50 cursor-pointer hover:bg-red-600 active:bg-[#972a2a]focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 transition">
-                <button className="text-[12px] font-['Poppins'] text-white font-normal">
-                  Delete
-                </button>
-              </div>
-            </div>
           </div>
 
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 ">
             {/* Left*/}
             <div className="flex flex-col items-start gap-[30px] ">
               {/* Images */}
-              <div className="h-[341px] w-[411px] px-[84px] py-[140px] bg-[#FEFEFE] rounded-[10px] border-[1px] border-dashed border-[#638424]">
-                <div className="flex flex-col gap-[14px] items-center justify-center self-stretch">
-                  <img src={uplaod} alt="uplaod-Image" />
-                  <div className="flex flex-col items-center self-stretch gap-[10px]">
+              <div className="relative h-[341px] w-[411px] bg-[#FEFEFE] rounded-[10px] border-[1px] border-dashed border-[#638424] shadow-md shadow-gray-500/40">
+                {/* If images exist */}
+                {inputValues.imgs.length > 0 ? (
+                  <div className="h-full w-full relative">
+                    <div className="relative h-full w-full flex items-center justify-center">
+                      {/* Full-size image */}
+                      <img
+                        src={URL.createObjectURL(
+                          formData.imgs.find(
+                            (file: any) =>
+                              file.name === inputValues.imgs[currentIndex]
+                          )
+                        )}
+                        alt={`Preview ${currentIndex}`}
+                        className="h-full w-full object-cover rounded-[10px]"
+                      />
+                      {/* Remove Icon */}
+                      <TiDelete
+                        onClick={() =>
+                          handleRemoveImage(inputValues.imgs[currentIndex])
+                        }
+                        className="absolute top-2 right-2 text-white hover:text-red-500 shadow-md text-2xl"
+                      />
+                    </div>
+                    {/* Left Arrow */}
+                    {inputValues.imgs.length > 1 && (
+                      <FaAngleLeft
+                        onClick={handlePrev}
+                        className="absolute left-2 top-1/2 transform -translate-y-1/2 bg-gray-800/20  text-white p-2 rounded-full hover:bg-gray-700/50 shadow-md text-4xl"
+                      />
+                    )}
+                    {/* Right Arrow */}
+                    {inputValues.imgs.length > 1 && (
+                      <FaAngleRight
+                        onClick={handleNext}
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-gray-800/20 text-white p-2 rounded-full hover:bg-gray-700/50 shadow-md text-4xl"
+                      />
+                    )}
+                    {/* Display Numbers for Image Navigation */}
+                    <div className="absolute bottom-16 left-1/2 transform -translate-x-1/2 flex space-x-3">
+                      {inputValues.imgs.map((_, index) => (
+                        <span
+                          key={index}
+                          onClick={() => setCurrentIndex(index)}
+                          className={`cursor-pointer flex items-center justify-center rounded-full font-semibold border-[1px] border-gray-200 px-2  ${
+                            index === currentIndex ? " text-white text-[12px]" : "text-[#c0c1bf] text-[10px]"
+                          }`}
+                        >
+                          {index + 1}
+                        </span>
+                      ))}
+                    </div>
+                    {/* Upload/Edit Button when images exist */}
+                    <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
+                      <input
+                        type="file"
+                        name="imgs"
+                        onChange={handleChange}
+                        multiple
+                        ref={fileInputRef}
+                        className="hidden"
+                      />
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className={`${
+                          inputValues.imgs.length > 0
+                            ? "text-white border-gray-200  hover:text-[#212020]"
+                            : "text-[#323232] border-gray-700 "
+                        } border-[1px] px-2 py-1 rounded-md text-[12px] font-normal hover:bg-[#dcdbdb88]`}
+                      >
+                        Upload or Edit
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-[14px] items-center justify-center h-full w-full">
+                    {/* Upload Placeholder */}
+                    <img
+                      src={uplaod}
+                      alt="Upload Placeholder"
+                      className="w-16 h-16"
+                    />
                     <h1 className="text-[14px] leading-normal font-['Poppins'] font-medium text-center text-black">
                       Image
                     </h1>
-                    <div className="">
-                      <div className="flex items-center">
-                        <input
-                          type="file"
-                          name="imgs"
-                          onChange={handleChange}
-                          multiple
-                          ref={fileInputRef}
-                        />
-                      </div>
-                      <div className="w-full flex flex-wrap">
-                        {inputValues.imgs.map((filename) => (
-                          <div
-                            key={filename}
-                            className="flex justify-center items-center px-2 py-1 border-[1px] border-gray-300 rounded-lg"
-                          >
-                            <span className="text-gray-800 font-medium text-[14px]">
-                              {filename}
-                            </span>
-                            <TiDelete
-                              onClick={() => handleRemoveImage(filename)}
-                              className="hover:text-[#7AA363] text-[16px] cursor-pointer"
-                            />
-                          </div>
-                        ))}
-                      </div>
+                    {/* Upload/Edit Button when no images */}
+                    <div className="mt-4">
+                      <input
+                        type="file"
+                        name="imgs"
+                        onChange={handleChange}
+                        multiple
+                        ref={fileInputRef}
+                        className="hidden"
+                      />
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className={`${
+                          inputValues.imgs.length > 0
+                            ? "text-white border-gray-200"
+                            : "text-[#323232] border-gray-700"
+                        } border-[1px] px-2 py-1 rounded-md text-[12px] font-normal hover:bg-[#dcdbdb]`}
+                      >
+                        Upload or Edit
+                      </button>
                     </div>
                   </div>
-                </div>
+                )}
               </div>
+
               {/* Left Bottom  */}
               <div className="flex flex-col gap-5 w-[411px]">
                 {/* Size */}
@@ -324,7 +413,6 @@ function PlantsAdmin() {
                     name="quantity"
                     value={formData.quantity || ""}
                     onChange={handleChange}
-                    required
                     className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
                   />
                 </div>
@@ -735,13 +823,24 @@ function PlantsAdmin() {
           <div className="text-center flex items-center justify-center gap-[16px]">
             <button
               type="submit"
-              className="w-36 text-xl h-[44px] bg-[#7AA363] text-white rounded-md duration-300 font-medium hover:bg-[#51912d] active:bg-[#7AA262]focus:outline-none focus:ring-2 focus:ring-[#b6f392] focus:ring-offset-2 transition shadow-lg"
+              className="w-36 text-xl h-[44px] bg-[#7AA363] text-white rounded-md duration-300 font-medium hover:bg-[#51912d] active:bg-[#7AA262]focus:outline-none focus:ring-2 focus:ring-[#b6f392] focus:ring-offset-2 transition shadow-lg shadow-gray-500/60"
             >
               {id ? "Update Plant" : "Add Plant"}
             </button>
-            {id && (
-              <button className="w-36 text-xl h-[44px] bg-[#fff] text-black rounded-md duration-300 font-medium hover:bg-[#c1c1c1] active:bg-[#7AA262]focus:outline-none focus:ring-2 focus:ring-[#b6f392] focus:ring-offset-2 transition shadow-lg">
-                {"Cancel"}
+
+            {id ? (
+              <button
+                onClick={handleClear}
+                className="w-36 text-xl h-[44px] bg-[#fff] text-black rounded-md duration-300 font-medium hover:bg-[#c1c1c1] active:bg-[#7AA262]focus:outline-none focus:ring-2 focus:ring-[#b6f392] focus:ring-offset-2 transition shadow-lg shadow-gray-500/60"
+              >
+                Cancel
+              </button>
+            ) : (
+              <button
+                onClick={handleClear}
+                className="w-36 text-xl h-[44px] bg-[#868782] text-white rounded-md duration-300 font-medium hover:bg-[#656761] active:bg-[#7AA262]focus:outline-none focus:ring-2 focus:ring-[#b6f392] focus:ring-offset-2 transition shadow-lg shadow-gray-500/60"
+              >
+                Clear
               </button>
             )}
           </div>
