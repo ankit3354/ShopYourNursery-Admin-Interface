@@ -26,23 +26,34 @@ const getPlantsAdmin = async (req, res) => {
 const createAdminPlant = async (req, res) => {
   try {
     const plantData = req.body;
-    const { title } = plantData;
+    const { title, sizeDetails } = plantData;
     // Ensure title and imgs files are provided
     if (!title) {
       return res.status(400).json({ message: "Plant title is required" });
+    }
+    if (typeof plantData.sizeDetails === "string") {
+      plantData.sizeDetails = JSON.parse(plantData.sizeDetails);
+    }
+    if (
+      !sizeDetails ||
+      !Array.isArray(plantData.sizeDetails) ||
+      !plantData.sizeDetails.length
+    ) {
+      return res.status(400).json({ message: "Size details are required" });
     }
     // Ensure images are provided
     if (!req.files || !req.files.length) {
       // Checking for files array length
       return res.status(400).json({ message: "Plant image is required" });
     }
+
     const images = req.files;
     const imageUrls = [];
     // Upload each image
     for (const image of images) {
       const result = await cloudinary.v2.uploader.upload(image.path, {
         folder: `PlantsAdmin/${title}`, // Fixed folder path
-        public_id: `${image.originalname.split('.')[0]}_${Date.now()}`,
+        public_id: `${image.originalname.split(".")[0]}_${Date.now()}`,
         use_filename: true,
         unique_filename: false, // Use the original file name
       });

@@ -7,11 +7,11 @@ export const getPlantsAdmin = async () => {
 };
 
 export const createPlantsAdmin = async (formData: FormData) => {
+  console.log("Adding New Plant :", formData);
   const response = await fetch(`${API_BASE_URL}/api/postInplants_admin`, {
     method: "POST",
     body: formData,
   });
-
   if (!response.ok) throw new Error("Failed to create plant");
   return response
     .json()

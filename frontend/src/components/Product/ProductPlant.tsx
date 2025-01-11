@@ -40,6 +40,7 @@ function ProductPlant({ product }: any) {
   const handleEdit = () => {
     navigate(`/admin/${product._id}`);
   };
+  // console.log(product.sizeDetails);
 
   return (
     <div className="shrink-0 flex flex-col justify-center relative cursor-pointer w-[11rem] max-w-[11rem] mx-auto border-none overflow-hidden border-black h-fit">
@@ -75,17 +76,40 @@ function ProductPlant({ product }: any) {
         <div className="flex items-center space-x-1">
           <span>Rating</span>
           <span className="text-yellow-400">★</span>
-          <span className="text-sm text-gray-600">{product.rating} / 5</span>
+          <span className="text-sm text-gray-600">
+            {product.sizeDetails.rating} / 5
+          </span>
         </div>
-        <div className="mt-1 text-md font-semibold">
+        {/* <div className="mt-1 text-md font-semibold">
           <span>Marked Price :</span>
           <span className="text-red-600 line-through">
-            ${product?.markedPrice ? product?.markedPrice.toFixed(2) : "0.00"}
+            ${product?.markedPrice ? product?.sizeDetails.markedPrice: "0.00"}
           </span>
         </div>
         <div className="mt-1 text-md font-semibold">
           <span>Price :</span>
-          <span className="text-green-600 ">${product.price.toFixed(2)}</span>
+          <span className="text-green-600 ">${product.price}</span>
+        </div> */}
+        {/* Render Size Details */}
+        <div className="mt-2">
+          {product.sizeDetails
+            .filter((detail: any) => detail.size === "small")
+            .map((detail: any) => (
+              <div key={detail._id} className="mb-2">
+                <h1>Size : {detail.size}</h1>
+                <span className="mt-1 text-md font-semibold">
+                  MarketPrice:{" "}
+                </span>
+                <span className="text-red-600 line-through">
+                  ${detail.marketPrice?.toFixed(2) || "0.00"}
+                </span>
+                <span className="mt-1 text-md font-semibold"> Price: </span>
+
+                <span className="text-green-600">
+                  ${detail.price?.toFixed(2) || "0.00"}
+                </span>
+              </div>
+            ))}
         </div>
         <div className="mt-1 mb-2 text-sm text-gray-500">
           <p>Category: {product.category}</p>

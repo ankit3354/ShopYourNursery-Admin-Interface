@@ -18,15 +18,37 @@ function PlantsAdmin() {
   const initialFormData = {
     title: "",
     description: "",
-    price: 0,
-    discountPercentage: 0,
-    markedPrice: 0,
-    quantity: 0,
+    // price: 0,
+    // discountPercentage: 0,
+    // markedPrice: 0,
+    // quantity: 0,
     reviewsCount: 0,
     rating: 0,
     featured: false,
     popular: false,
-    size: [], // Change from [] to ""
+    sizeDetails: [
+      {
+        size: "small",
+        price: 0,
+        marketPrice: 0,
+        discountPercentage: 0,
+        quantity: 0,
+      },
+      {
+        size: "medium",
+        price: 0,
+        marketPrice: 0,
+        discountPercentage: 0,
+        quantity: 0,
+      },
+      {
+        size: "large",
+        price: 0,
+        marketPrice: 0,
+        discountPercentage: 0,
+        quantity: 0,
+      },
+    ], // Change from [] to ""
     sunlightRequirement: "",
     waterFrequency: "",
     waterFrequencyDescription: [], // Change from [] to ""
@@ -104,23 +126,30 @@ function PlantsAdmin() {
   }, [id, getPlantById]);
 
   const handleChange = (e: any) => {
-    const { name, type, checked, value, files } = e.target;
+    const { name, type, checked, value, files, dataset } = e.target;
+    // Delegate sizeDetails updates to handleDetailChange
+    if (dataset?.index !== undefined && dataset.field) {
+      handleDetailChange(
+        parseInt(dataset.index, 10),
+        dataset.field,
+        type === "checkbox" ? checked : value
+      );
+      return;
+    }
+    // Handle general form updates
     setFormData((prevData) => {
-      let newValue;
+      let newValue: any;
       if (type === "file") {
         const fileArray = Array.from(files || []);
         newValue = fileArray;
-        // Update inputValues with the filenames of the new files
-        const imageNames = fileArray.map((file: any) => file.name);
         setInputValues((prevInputValues: any) => ({
           ...prevInputValues,
-          imgs: imageNames,
+          imgs: fileArray.map((file: any) => file.name),
         }));
       } else if (type === "checkbox" && Array.isArray(prevData[name])) {
-        const updatedArray = checked
+        newValue = checked
           ? [...prevData[name], value]
           : prevData[name].filter((item: any) => item !== value);
-        newValue = updatedArray;
       } else if (type === "checkbox") {
         newValue = checked;
       } else if (value === "true" || value === "false") {
@@ -128,10 +157,7 @@ function PlantsAdmin() {
       } else {
         newValue = value;
       }
-      return {
-        ...prevData,
-        [name]: newValue,
-      };
+      return { ...prevData, [name]: newValue };
     });
   };
 
@@ -156,54 +182,7 @@ function PlantsAdmin() {
     }));
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    console.log("Submitted:", formData);
-    try {
-      const formDataToSend = new FormData();
-      for (const key in formData) {
-        if (key === "imgs") {
-          formData[key].forEach((file: any) => {
-            formDataToSend.append("imgs", file);
-          });
-        } else if (Array.isArray(formData[key])) {
-          formData[key].forEach((item) => {
-            formDataToSend.append(key, item);
-          });
-        } else {
-          formDataToSend.append(key, formData[key]);
-        }
-      }
-      if (id) {
-        await handleUpdatePlantsAdmin.mutate({
-          id,
-          updateData: formDataToSend,
-        });
-        console.log("Plant updated successfully !");
-      } else {
-        const newPlant = await addPlant(formDataToSend);
-        console.log("Plant added successfully :", newPlant);
-      }
-      // Reset form data
-      setFormData(initialFormData);
-      setInputValues({
-        waterFrequencyDescription: "",
-        benefits: "",
-        nutritionalNeeds: "",
-        plantAccessories: "",
-        plantCare: "",
-        plantTags: "",
-        imgs: [],
-      });
-      navigate("/admin");
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
-    } catch (error) {
-      console.error("Failed to add plant:", error);
-    }
-  };
-  const handleClear = () => {
+  const handleClearAll = () => {
     setFormData(initialFormData);
     setInputValues({
       waterFrequencyDescription: "",
@@ -242,6 +221,68 @@ function PlantsAdmin() {
     setCurrentIndex((prevIndex) => (prevIndex + 1) % inputValues.imgs.length);
   };
 
+  const handleDetailChange = (index: number, field: string, value: any) => {
+    setFormData((prevData) => {
+      const updatedSizeDetails = [...prevData.sizeDetails];
+      updatedSizeDetails[index] = {
+        ...updatedSizeDetails[index],
+        [field]: value,
+      };
+      return { ...prevData, sizeDetails: updatedSizeDetails };
+    });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log("Submitting data:", formData);
+    try {
+      const formDataToSend = new FormData();
+      // Append all form data fields
+      for (const key in formData) {
+        const value = formData[key];
+        if (key === "imgs" && Array.isArray(value)) {
+          // Append image files separately
+          value.forEach((file) => formDataToSend.append("imgs", file));
+        } else if (key === "sizeDetails" && Array.isArray(value)) {
+          // Serialize sizeDetails as JSON string
+          formDataToSend.append(key, JSON.stringify(value));
+        } else if (Array.isArray(value)) {
+          // Handle other array fields
+          value.forEach((item) => formDataToSend.append(key, item));
+        } else {
+          formDataToSend.append(key, value);
+        }
+      }
+      if (id) {
+        await handleUpdatePlantsAdmin.mutate({
+          id,
+          updateData: formDataToSend,
+        });
+        console.log("Plant updated successfully!");
+      } else {
+        const newPlant = await addPlant(formDataToSend);
+        console.log("Plant added successfully:", newPlant);
+      }
+      // Reset form after submission
+      setFormData(initialFormData);
+      setInputValues({
+        imgs: [],
+        waterFrequencyDescription: "",
+        benefits: "",
+        nutritionalNeeds: "",
+        plantAccessories: "",
+        plantCare: "",
+        plantTags: "",
+      });
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+      navigate("/admin");
+    } catch (error) {
+      console.error("Failed to add plant:", error);
+    }
+  };
+
   return (
     <div className="bg-gray-100 min-h-screen p-6 border-[1px] font-['Poppins']">
       <div className="w-[1200px] mx-auto bg-[#F5F5F5] rounded-lg mt-20">
@@ -257,7 +298,6 @@ function PlantsAdmin() {
               Monstera Deliciosa
             </h1>
           </div>
-
           <div className="grid grid-cols-1 gap-5 md:grid-cols-2 ">
             {/* Left*/}
             <div className="flex flex-col items-start gap-[30px] ">
@@ -307,7 +347,9 @@ function PlantsAdmin() {
                           key={index}
                           onClick={() => setCurrentIndex(index)}
                           className={`cursor-pointer flex items-center justify-center rounded-full font-semibold border-[1px] border-gray-200 px-2  ${
-                            index === currentIndex ? " text-white text-[12px]" : "text-[#c0c1bf] text-[10px]"
+                            index === currentIndex
+                              ? " text-white text-[12px]"
+                              : "text-[#c0c1bf] text-[10px]"
                           }`}
                         >
                           {index + 1}
@@ -371,11 +413,114 @@ function PlantsAdmin() {
                   </div>
                 )}
               </div>
-
               {/* Left Bottom  */}
               <div className="flex flex-col gap-5 w-[411px]">
+                <div className="flex flex-col gap-5">
+                  {formData.sizeDetails.map((detail: any, index: number) => (
+                    <div key={detail.size} className="flex flex-col gap-3">
+                      <div className="flex items-center gap-3">
+                        {/* Size Checkbox */}
+                        <input
+                          type="checkbox"
+                          checked={detail.showDetails || false}
+                          data-index={index}
+                          data-field="showDetails"
+                          onChange={handleChange}
+                          className="w-5 h-5"
+                        />
+                        <h4 className="text-lg font-medium">
+                          Size:
+                          {detail.size.charAt(0).toUpperCase() +
+                            detail.size.slice(1)}
+                        </h4>
+                      </div>
+                      {/* Conditionally Render Price and Marked Price Inputs */}
+                      {detail.showDetails && (
+                        <>
+                          {/* Price Input */}
+                          <div className="flex items-center gap-5">
+                            <label className="w-[200px] font-['Poppins'] text-[18px]">
+                              Price:
+                            </label>
+                            <input
+                              type="number"
+                              placeholder="0"
+                              value={detail.price || ""}
+                              onChange={(e) =>
+                                handleDetailChange(
+                                  index,
+                                  "price",
+                                  e.target.value
+                                )
+                              }
+                              className="w-[191px] p-2 border bg-[#ECECEC] rounded text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                            />
+                          </div>
+                          {/* Marked Price Input */}
+                          <div className="flex items-center gap-5">
+                            <label className="w-[200px] font-['Poppins'] text-[18px]">
+                              Market Price:
+                            </label>
+                            <input
+                              type="number"
+                              placeholder="0"
+                              value={detail.marketPrice || ""}
+                              onChange={(e) =>
+                                handleDetailChange(
+                                  index,
+                                  "marketPrice",
+                                  e.target.value
+                                )
+                              }
+                              className="w-[191px] p-2 border bg-[#ECECEC] rounded text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                            />
+                          </div>
+                          {/* Quantity Input */}
+                          <div className="flex items-center gap-5">
+                            <label className="w-[200px] font-['Poppins'] text-[18px]">
+                              Quantity:
+                            </label>
+                            <input
+                              type="number"
+                              placeholder="0"
+                              value={detail.quantity || ""}
+                              onChange={(e) =>
+                                handleDetailChange(
+                                  index,
+                                  "quantity",
+                                  e.target.value
+                                )
+                              }
+                              className="w-[191px] p-2 border bg-[#ECECEC] rounded text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                            />
+                          </div>
+                          {/* discountPercentage Input */}
+                          <div className="flex items-center gap-5">
+                            <label className="w-[200px] font-['Poppins'] text-[18px]">
+                              Discount Percentage:
+                            </label>
+                            <input
+                              type="number"
+                              placeholder="0"
+                              value={detail.discountPercentage || ""}
+                              onChange={(e) =>
+                                handleDetailChange(
+                                  index,
+                                  "discountPercentage",
+                                  e.target.value
+                                )
+                              }
+                              className="w-[191px] p-2 border bg-[#ECECEC] rounded text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                            />
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  ))}
+                </div>
+
                 {/* Size */}
-                <div className="flex items-center gap-5 w-[411px]">
+                {/* <div className="flex items-center gap-5 w-[411px]">
                   <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
                     Size:
                   </label>
@@ -402,9 +547,9 @@ function PlantsAdmin() {
                       </div>
                     ))}
                   </div>
-                </div>
+                </div> */}
                 {/* Quantity */}
-                <div className="flex items-center gap-5 w-[411px]">
+                {/* <div className="flex items-center gap-5 w-[411px]">
                   <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
                     Quantity:
                   </label>
@@ -415,9 +560,9 @@ function PlantsAdmin() {
                     onChange={handleChange}
                     className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
                   />
-                </div>
+                </div> */}
                 {/* Price */}
-                <div className="flex items-center gap-5 w-[411px]">
+                {/* <div className="flex items-center gap-5 w-[411px]">
                   <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
                     Price:
                   </label>
@@ -429,9 +574,9 @@ function PlantsAdmin() {
                     required
                     className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
                   />
-                </div>
+                </div> */}
                 {/* Marked Price */}
-                <div className="flex items-center gap-5 w-[411px]">
+                {/* <div className="flex items-center gap-5 w-[411px]">
                   <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
                     Marked Price:
                   </label>
@@ -442,7 +587,20 @@ function PlantsAdmin() {
                     onChange={handleChange}
                     className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
                   />
-                </div>
+                </div> */}
+                {/* Discount Percentage */}
+                {/* <div className="flex items-center gap-5 w-[411px]">
+                  <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                    Discount Percentage:
+                  </label>
+                  <input
+                    type="number"
+                    name="discountPercentage"
+                    value={formData.discountPercentage || ""}
+                    onChange={handleChange}
+                    className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                  />
+                </div> */}
                 {/* place*/}
                 <div className="flex items-center gap-5 w-[411px]">
                   <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
@@ -458,19 +616,6 @@ function PlantsAdmin() {
                     <option value="Outdoor">Outdoor</option>
                     <option value="Pet Friendly">Pet Friendly</option>
                   </select>
-                </div>
-                {/* Discount Percentage */}
-                <div className="flex items-center gap-5 w-[411px]">
-                  <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
-                    Discount Percentage:
-                  </label>
-                  <input
-                    type="number"
-                    name="discountPercentage"
-                    value={formData.discountPercentage || ""}
-                    onChange={handleChange}
-                    className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-                  />
                 </div>
                 {/* Growth Rate */}
                 <div className="flex items-center gap-5 w-[411px]">
@@ -533,8 +678,42 @@ function PlantsAdmin() {
                     <option value="false">False</option>
                   </select>
                 </div>
+                {/* Pest Resistance */}
+                <div className="flex items-center gap-5 w-[411px]">
+                  <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                    Pest Resistance&nbsp;&nbsp;:
+                  </label>
+                  <select
+                    name="pestResistance"
+                    value={formData?.pestResistance || ""}
+                    onChange={handleArrayChange}
+                    className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                  >
+                    <option value="">Select Resistance</option>
+                    <option value="High">High</option>
+                    <option value="Moderate">Moderate</option>
+                  </select>
+                </div>
+                {/* Propagation Method */}
+                <div className="flex items-center gap-5 w-[411px]">
+                  <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
+                    Propagation Method&nbsp;&nbsp;:
+                  </label>
+                  <select
+                    name="propagationMethod"
+                    value={formData.propagationMethod || ""}
+                    onChange={handleArrayChange}
+                    className="flex flex-col items-start gap-2 shrink-0 w-[191px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
+                  >
+                    <option value="">Select Method</option>
+                    <option value="Cuttings, Seeds">Cuttings, Seeds</option>
+                    <option value="Cuttings">Cuttings</option>
+                    <option value="Seeds, Grafting">Seeds, Grafting</option>
+                    <option value="Seeds">Seeds</option>
+                  </select>
+                </div>
                 {/* Seasonal Availability */}
-                <div className="flex items-center gap-5">
+                <div className="flex items-center gap-5 w-[411px]">
                   <label className="text-black w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
                     Seasonal Availability:
                   </label>
@@ -646,40 +825,6 @@ function PlantsAdmin() {
                   className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
                   onChange={handleTextChange}
                 />
-              </div>
-              {/* Propagation Method */}
-              <div className="flex items-center gap-5 w-[560px]">
-                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
-                  Propagation Method&nbsp;&nbsp;:
-                </label>
-                <select
-                  name="propagationMethod"
-                  value={formData.propagationMethod || ""}
-                  onChange={handleArrayChange}
-                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-                >
-                  <option value="">Select Propagation Method</option>
-                  <option value="Cuttings, Seeds">Cuttings, Seeds</option>
-                  <option value="Cuttings">Cuttings</option>
-                  <option value="Seeds, Grafting">Seeds, Grafting</option>
-                  <option value="Seeds">Seeds</option>
-                </select>
-              </div>
-              {/* Pest Resistance */}
-              <div className="flex items-center gap-5 w-[560px]">
-                <label className="text-black shrink-0 w-[200px] font-['Poppins'] text-[18px] font-normal leading-normal">
-                  Pest Resistance&nbsp;&nbsp;:
-                </label>
-                <select
-                  name="pestResistance"
-                  value={formData?.pestResistance || ""}
-                  onChange={handleArrayChange}
-                  className="flex flex-col items-start gap-2 shrink-0 w-[360px] h-[44px] p-[10px_21px] border border-gray-300 bg-[#ECECEC] rounded-[10px] text-gray-700 focus:ring-2 focus:ring-[#7AA363] focus:outline-none"
-                >
-                  <option value="">Select Pest Resistance</option>
-                  <option value="High">High</option>
-                  <option value="Moderate">Moderate</option>
-                </select>
               </div>
               {/* Toxicity Level */}
               <div className="flex items-center gap-5 w-[560px]">
@@ -819,7 +964,6 @@ function PlantsAdmin() {
               </div>
             </div>
           </div>
-
           <div className="text-center flex items-center justify-center gap-[16px]">
             <button
               type="submit"
@@ -830,14 +974,14 @@ function PlantsAdmin() {
 
             {id ? (
               <button
-                onClick={handleClear}
+                onClick={handleClearAll}
                 className="w-36 text-xl h-[44px] bg-[#fff] text-black rounded-md duration-300 font-medium hover:bg-[#c1c1c1] active:bg-[#7AA262]focus:outline-none focus:ring-2 focus:ring-[#b6f392] focus:ring-offset-2 transition shadow-lg shadow-gray-500/60"
               >
                 Cancel
               </button>
             ) : (
               <button
-                onClick={handleClear}
+                onClick={handleClearAll}
                 className="w-36 text-xl h-[44px] bg-[#868782] text-white rounded-md duration-300 font-medium hover:bg-[#656761] active:bg-[#7AA262]focus:outline-none focus:ring-2 focus:ring-[#b6f392] focus:ring-offset-2 transition shadow-lg shadow-gray-500/60"
               >
                 Clear
